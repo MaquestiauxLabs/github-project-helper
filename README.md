@@ -9,6 +9,9 @@ A VS Code extension that helps you manage GitHub Project V2 statuses directly fr
 - 🏷️ **Status Updates**: Update issue status (Todo, In Progress, Done) with a single click
 - 🔄 **Real-time Updates**: Fetches live data from your GitHub projects
 - 📊 **Status Visualization**: Issues are sorted by status (Todo → In Progress → Done) for better prioritization
+- 🏢 **Workspace Projects**: Configure frequently used projects for quick access
+- ⚙️ **Customizable Settings**: Configure organizations, default values, and status options
+- 🎯 **Smart Defaults**: Pre-fill organization and project selections for faster workflow
 
 ## Requirements
 
@@ -79,53 +82,145 @@ Before using this extension, you need:
    - Choose an issue to update from the project's issues
    - Select the new status (Todo, In Progress, or Done)
 
-### Step-by-Step Example
+### Step-by-Step Examples
 
-1. Press `Ctrl+Shift+P` and run "Update GitHub Issue Status"
-2. Enter organization name: `MaquestiauxLabs`
-3. Select project: `Demo Resume (using React)` #2
-4. Choose issue: `#7 - Set up Project Structure` (Status: Todo)
-5. Select new status: `In Progress`
+#### Basic Usage
+1. Press `Ctrl+Alt+G` (or `Ctrl+Shift+P` → "GPH: Update GitHub Issue Status")
+2. Choose selection method:
+   - **Select from workspace projects** (if configured)
+   - **Browse GitHub** (normal flow)
+3. Enter/select organization name
+4. Select project from dropdown
+5. Choose issue to update
+6. Select new status
 
-The extension will update the issue status and show a success notification.
+#### Using Workspace Projects
+1. Configure workspace projects in settings or use "GPH: Add Project to Workspace"
+2. Press `Ctrl+Alt+G`
+3. Select "Select from workspace projects"
+4. Choose from your pre-configured projects
+5. Continue with issue selection and status update
+
+#### Managing Workspace Projects
+1. **Add project**: `Ctrl+Shift+P` → "GPH: Add Project to Workspace"
+   - Enter organization
+   - Select project from GitHub
+   - Add optional description
+2. **Remove projects**: `Ctrl+Shift+P` → "GPH: Remove Workspace Projects"
+   - Select projects to remove (multi-select)
+   - Confirm removal
 
 ### Status Display
 
 Issues are displayed with their current status:
-
 - **Todo**: Items that need to be started
 - **In Progress**: Currently being worked on
 - **Done**: Completed items
 - **No Status**: Items without a status assigned
+- **Custom**: Any status options you configure
 
 ### Sorting
 
 - **Projects**: Sorted alphabetically by name
-- **Issues**: Sorted by status priority (Todo → In Progress → Done)
+- **Issues**: Sorted by status priority based on your `statusOptions` configuration
 
 ## Commands
 
-| Command                              | Description                        | Keyboard Shortcut        |
-| ------------------------------------ | ---------------------------------- | ------------------------ |
-| `github-project-helper.updateStatus` | Update GitHub Project issue status | None (can be customized) |
+| Command | Description | Keyboard Shortcut |
+|---------|-------------|------------------|
+| `github-project-helper.updateStatus` | Update GitHub Project issue status | `Ctrl+Alt+G` (Mac: `Cmd+Alt+G`) |
+| `github-project-helper.addWorkspaceProject` | Add project to workspace for quick access | None |
+| `github-project-helper.removeWorkspaceProjects` | Remove projects from workspace configuration | None |
 
 ## Configuration
 
-You can set up a keyboard shortcut for the command:
+### Extension Settings
 
-1. Open VS Code settings (`Ctrl+,`)
-2. Go to "Keyboard Shortcuts" (`Ctrl+K Ctrl+S`)
-3. Search for "Update GitHub Issue Status"
-4. Click the "+" icon to add your preferred shortcut
+You can configure the extension through VS Code settings (`Ctrl+,`) or by editing your `.vscode/settings.json` file:
 
-Example setup:
-
+#### Organizations
 ```json
 {
-  "key": "ctrl+alt+g",
-  "command": "github-project-helper.updateStatus"
+  "githubProjectHelper.organizations": [
+    "MyOrg",
+    "AnotherOrg",
+    "OpenSourceProject"
+  ]
 }
 ```
+
+#### Workspace Projects
+```json
+{
+  "githubProjectHelper.workspaceProjects": [
+    {
+      "name": "Frontend Development",
+      "owner": "MyOrg",
+      "description": "Main frontend project"
+    },
+    {
+      "name": "Backend API",
+      "owner": "MyOrg",
+      "description": "REST API services"
+    }
+  ]
+}
+```
+
+#### Default Values
+```json
+{
+  "githubProjectHelper.defaultOwner": "MyOrg",
+  "githubProjectHelper.defaultProject": "Frontend Development"
+}
+```
+
+#### Custom Status Options
+```json
+{
+  "githubProjectHelper.statusOptions": [
+    "Todo",
+    "In Progress", 
+    "Review",
+    "Testing",
+    "Done"
+  ]
+}
+```
+
+#### UI Preferences
+```json
+{
+  "githubProjectHelper.showQuickPickForOwner": true
+}
+```
+
+### Managing Workspace Projects
+
+Instead of manually editing JSON, you can use the built-in commands:
+
+1. **Add Project to Workspace**:
+   - Press `Ctrl+Shift+P`
+   - Type "GPH: Add Project to Workspace"
+   - Enter organization name
+   - Select project from dropdown
+   - Add optional description
+
+2. **Remove Workspace Projects**:
+   - Press `Ctrl+Shift+P`
+   - Type "GPH: Remove Workspace Projects"
+   - Select projects to remove (multi-select supported)
+
+### Keyboard Shortcuts
+
+The extension includes a default shortcut:
+- `Ctrl+Alt+G` (Mac: `Cmd+Alt+G`) - Update GitHub Issue Status
+
+You can customize shortcuts:
+1. Open VS Code settings (`Ctrl+,`)
+2. Go to "Keyboard Shortcuts" (`Ctrl+K Ctrl+S`)
+3. Search for "GitHub Project Helper"
+4. Click the pencil icon to modify shortcuts
 
 ## Troubleshooting
 
@@ -240,13 +335,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Changelog
 
 ### Version 0.0.1 (Initial Release)
-
 - Project selection from GitHub organizations
 - Issue listing with status display
 - Status update functionality (Todo, In Progress, Done)
 - Automatic sorting of projects and issues
 - Progress indicators for long-running operations
 - Error handling and user feedback
+- Workspace project management with UI commands
+- Comprehensive settings for organizations, defaults, and status options
+- Keyboard shortcut support (`Ctrl+Alt+G`)
+- Smart default value pre-filling
+- Multi-select for removing workspace projects
 
 ## Support
 

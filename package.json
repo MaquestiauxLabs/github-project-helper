@@ -22,6 +22,16 @@
         "command": "github-project-helper.updateStatus",
         "title": "GPH: Update GitHub Issue Status",
         "category": "GitHub Project Helper"
+      },
+      {
+        "command": "github-project-helper.addWorkspaceProject",
+        "title": "GPH: Add Project to Workspace",
+        "category": "GitHub Project Helper"
+      },
+      {
+        "command": "github-project-helper.removeWorkspaceProjects",
+        "title": "GPH: Remove Workspace Projects",
+        "category": "GitHub Project Helper"
       }
     ],
     "keybindings": [
@@ -30,7 +40,71 @@
         "key": "ctrl+alt+g",
         "mac": "cmd+alt+g"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "GitHub Project Helper",
+      "properties": {
+        "githubProjectHelper.organizations": {
+          "type": "array",
+          "default": [],
+          "description": "List of GitHub organizations to quickly select from",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*$",
+            "patternErrorMessage": "Must be a valid GitHub organization name"
+          }
+        },
+        "githubProjectHelper.defaultOwner": {
+          "type": "string",
+          "default": "",
+          "description": "Default GitHub organization/owner to pre-fill"
+        },
+        "githubProjectHelper.defaultProject": {
+          "type": "string",
+          "default": "",
+          "description": "Default project name to pre-select (if found in the organization)"
+        },
+        "githubProjectHelper.statusOptions": {
+          "type": "array",
+          "default": ["Todo", "In Progress", "Done"],
+          "description": "Available status options to choose from",
+          "items": {
+            "type": "string"
+          }
+        },
+        "githubProjectHelper.showQuickPickForOwner": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show quick pick for organization selection instead of input box"
+        },
+        "githubProjectHelper.workspaceProjects": {
+          "type": "array",
+          "default": [],
+          "description": "List of predefined projects for quick access in this workspace",
+          "items": {
+            "type": "object",
+            "required": ["name", "owner"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Project name"
+              },
+              "owner": {
+                "type": "string",
+                "description": "GitHub organization/owner"
+              },
+              "description": {
+                "type": "string",
+                "description": "Optional project description"
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
