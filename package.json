@@ -1,6 +1,10 @@
 {
   "name": "github-project-helper",
   "displayName": "github-project-helper",
+  "author": {
+    "name": "Jean-Philippe Maquestiaux",
+    "email": "maquejp@gmail.com"
+  },
   "description": "",
   "version": "0.0.1",
   "engines": {
