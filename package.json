@@ -5,21 +5,30 @@
     "name": "Jean-Philippe Maquestiaux",
     "email": "maquejp@gmail.com"
   },
-  "description": "",
+  "description": "Manage GitHub Project V2 statuses directly from VS Code with GitHub CLI integration",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.109.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "SCM Providers"
   ],
-  "activationEvents": [],
+
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "github-project-helper.updateStatus",
-        "title": "GPH: Update GitHub Issue Status"
+        "title": "GPH: Update GitHub Issue Status",
+        "category": "GitHub Project Helper"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "github-project-helper.updateStatus",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g"
       }
     ]
   },
@@ -46,5 +55,24 @@
     "webpack-cli": "^6.0.1",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MaquestiauxLabs/github-project-helper.git"
+  },
+  "homepage": "https://github.com/MaquestiauxLabs/github-project-helper#readme",
+  "bugs": {
+    "url": "https://github.com/MaquestiauxLabs/github-project-helper/issues"
+  },
+  "keywords": [
+    "github",
+    "project",
+    "issues",
+    "status",
+    "v2",
+    "workflow",
+    "cli",
+    "scm"
+  ],
+  "license": "MIT"
 }
