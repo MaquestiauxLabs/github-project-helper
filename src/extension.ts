@@ -69,7 +69,18 @@ export function activate(context: vscode.ExtensionContext) {
             description: item.status || 'No Status',
             id: item.id,
             issueNumber: item.content.number
-          }));
+          }))
+          .sort((a: any, b: any) => {
+            // Sort by status: Todo -> In Progress -> Done
+            const statusOrder = { 'Todo': 0, 'In Progress': 1, 'Done': 2 };
+            const aStatus = a.description;
+            const bStatus = b.description;
+            
+            const aOrder = statusOrder[aStatus as keyof typeof statusOrder] ?? 3;
+            const bOrder = statusOrder[bStatus as keyof typeof statusOrder] ?? 3;
+            
+            return aOrder - bOrder;
+          });
 
         const selectedIssue = await vscode.window.showQuickPick(issueItems, {
           placeHolder: "Select issue to update",
