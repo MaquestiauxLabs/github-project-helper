@@ -8,6 +8,19 @@ export interface GitHubProject {
   title: string;
   number: number;
   id: string;
+  fields?: GitHubField[];
+}
+
+export interface GitHubField {
+  id: string;
+  name: string;
+  dataType: string;
+  options?: GitHubFieldOption[];
+}
+
+export interface GitHubFieldOption {
+  id: string;
+  name: string;
 }
 
 export interface GitHubItem {
@@ -50,42 +63,43 @@ export class GitHubService {
     return response.projects || [];
   }
 
+  async getProjectWithFields(owner: string, projectNumber: number): Promise<GitHubProject | null> {
+    // Get project details
+    const { stdout: projectJson } = await execAsync(`gh project view ${projectNumber} --owner ${owner} --format json`);
+    const project = JSON.parse(projectJson);
+    
+    // Get project fields
+    const { stdout: fieldsJson } = await execAsync(`gh project field-list ${projectNumber} --owner ${owner} --format json`);
+    const fieldsResponse = JSON.parse(fieldsJson);
+    
+    return {
+      ...project,
+      fields: fieldsResponse.fields || []
+    };
+  }
+
   async getProjectItems(owner: string, projectNumber: number): Promise<GitHubItem[]> {
     const { stdout: itemsJson } = await execAsync(`gh project item-list ${projectNumber} --owner ${owner} --format json`);
     const response = JSON.parse(itemsJson);
     return response.items || [];
   }
 
-  async updateItemStatus(owner: string, projectNumber: number, issueNumber: number, newStatus: string): Promise<void> {
-    const projectId = await this.getProjectId(owner, projectNumber);
-    const statusFieldId = await this.getStatusFieldId(owner, projectNumber);
-    const statusOptionId = await this.getStatusOptionId(owner, projectNumber, newStatus);
-    const itemId = await this.getItemId(owner, projectNumber, issueNumber);
-
-    if (!projectId || !statusFieldId || !statusOptionId || !itemId) {
-      throw new Error('Failed to extract required IDs from GitHub API');
+  async updateItemStatus(project: GitHubProject, item: GitHubItem, newStatus: string): Promise<void> {
+    const projectId = project.id;
+    const statusField = project.fields?.find(field => field.name === 'Status');
+    
+    if (!statusField) {
+      throw new Error('Status field not found in project');
+    }
+    
+    const statusOption = statusField.options?.find(option => option.name === newStatus);
+    
+    if (!statusOption) {
+      throw new Error(`Status option "${newStatus}" not found in project`);
     }
 
-    await execAsync(`gh project item-edit --id "${itemId}" --project-id "${projectId}" --field-id "${statusFieldId}" --single-select-option-id "${statusOptionId}"`);
-  }
+    const itemId = item.id;
 
-  private async getProjectId(owner: string, projectNumber: number): Promise<string | null> {
-    const { stdout } = await execAsync(`gh project view ${projectNumber} --owner ${owner} --format json | jq -r '.id'`);
-    return stdout.trim() || null;
-  }
-
-  private async getStatusFieldId(owner: string, projectNumber: number): Promise<string | null> {
-    const { stdout } = await execAsync(`gh project field-list ${projectNumber} --owner ${owner} --format json | jq -r '.fields[] | select(.name=="Status") | .id'`);
-    return stdout.trim() || null;
-  }
-
-  private async getStatusOptionId(owner: string, projectNumber: number, newStatus: string): Promise<string | null> {
-    const { stdout } = await execAsync(`gh project field-list ${projectNumber} --owner ${owner} --format json | jq -r '.fields[] | select(.name=="Status") | .options[] | select(.name=="${newStatus}") | .id'`);
-    return stdout.trim() || null;
-  }
-
-  private async getItemId(owner: string, projectNumber: number, issueNumber: number): Promise<string | null> {
-    const { stdout } = await execAsync(`gh project item-list ${projectNumber} --owner ${owner} --format json | jq -r '.items[] | select(.content.number==${issueNumber}) | .id'`);
-    return stdout.trim() || null;
+    await execAsync(`gh project item-edit --id "${itemId}" --project-id "${projectId}" --field-id "${statusField.id}" --single-select-option-id "${statusOption.id}"`);
   }
 }

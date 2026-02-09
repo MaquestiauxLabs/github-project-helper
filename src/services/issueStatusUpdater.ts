@@ -101,12 +101,12 @@ export class IssueStatusUpdater {
     }
 
     try {
-      const selectedProject = await this.selectProject(owner, projectFromWorkspace, defaultProjectName);
-      if (!selectedProject) {
+      const projectData = await this.selectProject(owner, projectFromWorkspace, defaultProjectName);
+      if (!projectData) {
         return;
       }
 
-      const selectedIssue = await this.selectIssue(owner, selectedProject);
+      const selectedIssue = await this.selectIssue(owner, projectData.selectedItem);
       if (!selectedIssue) {
         return;
       }
@@ -116,16 +116,19 @@ export class IssueStatusUpdater {
         return;
       }
 
-      await this.executeStatusUpdate(owner, selectedProject, selectedIssue, newStatus);
+      const issueData = await this.selectIssue(owner, projectData.selectedItem);
+      if (!issueData) {
+        return;
+      }
+
+      await this.executeStatusUpdate(projectData.project, issueData.issue);
 
     } catch (error) {
       vscode.window.showErrorMessage(`Failed to update issue: ${error}`);
     }
   }
 
-  private async selectProject(owner: string, projectFromWorkspace: any, defaultProjectName: string): Promise<ProjectItem | null> {
-    let selectedProject: any = null;
-    
+  private async selectProject(owner: string, projectFromWorkspace: any, defaultProjectName: string): Promise<{ project: any, selectedItem: any } | null> {
     if (projectFromWorkspace) {
       const projects = await this.githubService.getProjects(owner);
       const foundProject = projects.find((p: GitHubProject) => p.title === projectFromWorkspace.label);
@@ -135,11 +138,14 @@ export class IssueStatusUpdater {
         return null;
       }
       
-      selectedProject = {
-        label: foundProject.title,
-        description: `#${foundProject.number}`,
-        id: foundProject.id,
-        projectNumber: foundProject.number
+      return {
+        project: foundProject,
+        selectedItem: {
+          label: foundProject.title,
+          description: `#${foundProject.number}`,
+          id: foundProject.id,
+          projectNumber: foundProject.number
+        }
       };
     } else {
       const projects = await this.githubService.getProjects(owner);
@@ -163,21 +169,25 @@ export class IssueStatusUpdater {
         defaultProjectIndex = projectItems.findIndex((p: any) => p.label === defaultProjectName);
       }
 
-      selectedProject = await vscode.window.showQuickPick(projectItems, {
+      const selectedItem = await vscode.window.showQuickPick(projectItems, {
         placeHolder: "Select GitHub project",
         matchOnDescription: true,
         title: defaultProjectIndex >= 0 ? `Default: ${defaultProjectName}` : undefined
       });
 
-      if (!selectedProject) {
+      if (!selectedItem) {
         return null;
       }
-    }
 
-    return selectedProject;
+      const selectedProject = projects.find((p: GitHubProject) => p.title === selectedItem.label);
+      return {
+        project: selectedProject,
+        selectedItem
+      };
+    }
   }
 
-  private async selectIssue(owner: string, selectedProject: any): Promise<IssueItem | null> {
+  private async selectIssue(owner: string, selectedProject: any): Promise<{ issue: any, selectedItem: IssueItem } | null> {
     const items = await this.githubService.getProjectItems(owner, selectedProject.projectNumber);
     
     if (items.length === 0) {
@@ -206,12 +216,17 @@ export class IssueStatusUpdater {
         return aOrder - bOrder;
       });
 
-    const selectedIssue = await vscode.window.showQuickPick(issueItems, {
+    const selectedItem = await vscode.window.showQuickPick(issueItems, {
       placeHolder: "Select issue to update",
       matchOnDescription: true
     });
 
-    return selectedIssue || null;
+    if (!selectedItem) {
+      return null;
+    }
+
+    const issue = items.find((item: GitHubItem) => item.id === selectedItem.id);
+    return { issue, selectedItem };
   }
 
   private async selectStatus(statusOptions: string[]): Promise<string | null> {
@@ -220,7 +235,13 @@ export class IssueStatusUpdater {
     }) || null;
   }
 
-  private async executeStatusUpdate(owner: string, selectedProject: any, selectedIssue: IssueItem, newStatus: string): Promise<void> {
+  private async executeStatusUpdate(project: any, issue: any): Promise<void> {
+    const statusOptions = ConfigurationService.getStatusOptions();
+    const newStatus = await this.selectStatus(statusOptions);
+    if (!newStatus) {
+      return;
+    }
+
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
@@ -228,17 +249,12 @@ export class IssueStatusUpdater {
         cancellable: false,
       },
       async () => {
-        await this.githubService.updateItemStatus(
-          owner,
-          selectedProject.projectNumber,
-          selectedIssue.issueNumber,
-          newStatus
-        );
+        await this.githubService.updateItemStatus(project, issue, newStatus);
       },
     );
 
     vscode.window.showInformationMessage(
-      `Successfully updated issue #${selectedIssue.issueNumber} to "${newStatus}"`
+      `Successfully updated issue #${issue.content.number} to "${newStatus}"`
     );
   }
 }

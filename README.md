@@ -10,8 +10,10 @@ A VS Code extension that helps you manage GitHub Project V2 statuses directly fr
 - 🔄 **Real-time Updates**: Fetches live data from your GitHub projects
 - 📊 **Status Visualization**: Issues are sorted by status (Todo → In Progress → Done) for better prioritization
 - 🏢 **Workspace Projects**: Configure frequently used projects for quick access
-- ⚙️ **Customizable Settings**: Configure organizations, default values, and status options
+- ⚙️ **Customizable Settings**: Configure organizations, defaults, and status options
 - 🎯 **Smart Defaults**: Pre-fill organization and project selections for faster workflow
+- ⚡ **Performance Optimized**: Reduced API calls with intelligent data caching
+- 🏗️ **Modular Architecture**: Clean, maintainable codebase with separation of concerns
 
 ## Requirements
 
@@ -290,7 +292,12 @@ npm run watch
 ```
 github-project-helper/
 ├── src/
-│   ├── extension.ts      # Main extension logic
+│   ├── extension.ts              # Extension entry point and command registration
+│   ├── services/
+│   │   ├── githubService.ts      # GitHub API interactions and data models
+│   │   ├── configurationService.ts # VS Code settings management
+│   │   ├── workspaceProjectManager.ts # Workspace project operations
+│   │   └── issueStatusUpdater.ts # Main workflow logic
 │   └── test/
 │       └── extension.test.ts
 ├── package.json          # Extension configuration
@@ -298,6 +305,22 @@ github-project-helper/
 ├── webpack.config.js      # Build configuration
 └── README.md             # This file
 ```
+
+### Architecture
+
+The extension follows a modular architecture with separation of concerns:
+
+- **GitHubService**: Handles all GitHub CLI interactions and API calls
+- **ConfigurationService**: Manages VS Code settings and workspace configuration
+- **WorkspaceProjectManager**: Provides UI commands for workspace project management
+- **IssueStatusUpdater**: Orchestrates the main status update workflow
+- **Extension**: Minimal entry point for command registration
+
+This architecture ensures:
+- **Maintainability**: Each service has a single responsibility
+- **Testability**: Services can be unit tested independently
+- **Performance**: Optimized API calls with data caching
+- **Scalability**: Easy to extend with new features
 
 ### Testing
 
@@ -346,6 +369,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Keyboard shortcut support (`Ctrl+Alt+G`)
 - Smart default value pre-filling
 - Multi-select for removing workspace projects
+- Optimized API calls with data caching
+- Modular code architecture for maintainability
+- Reduced GitHub API load and faster response times
 
 ## Support
 
