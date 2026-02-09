@@ -19,7 +19,7 @@
     "commands": [
       {
         "command": "github-project-helper.updateStatus",
-        "title": "Update GitHub Issue Status"
+        "title": "GPH: Update GitHub Issue Status"
       }
     ]
   },
