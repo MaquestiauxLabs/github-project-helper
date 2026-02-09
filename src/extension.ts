@@ -49,15 +49,38 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         const projectId = (selectedProject as any).id;
+        const projectNumber = (selectedProject as any).description?.replace('#', '');
 
-        const issue = await vscode.window.showInputBox({
-          prompt: "GitHub issue number",
-          placeHolder: "123",
-        });
-
-        if (!issue) {
+        // Fetch issues from the selected project using the project number
+        const { stdout: itemsJson } = await execAsync(`gh project item-list ${projectNumber} --owner ${owner} --format json`);
+        const itemsResponse = JSON.parse(itemsJson);
+        
+        const itemsArray = itemsResponse.items || [];
+        
+        if (itemsArray.length === 0) {
+          vscode.window.showErrorMessage(`No issues found in project`);
           return;
         }
+
+        const issueItems = itemsArray
+          .filter((item: any) => item.content && item.content.number) // Only show items with issue numbers
+          .map((item: any) => ({
+            label: `#${item.content.number} - ${item.content.title}`,
+            description: item.status || 'No Status',
+            id: item.id,
+            issueNumber: item.content.number
+          }));
+
+        const selectedIssue = await vscode.window.showQuickPick(issueItems, {
+          placeHolder: "Select issue to update",
+          matchOnDescription: true
+        });
+
+        if (!selectedIssue) {
+          return;
+        }
+
+        const issueNumber = (selectedIssue as any).issueNumber;
 
         const status = await vscode.window.showQuickPick(
           ["Todo", "In Progress", "Done"],
@@ -68,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
           return;
         }
 
-        const command = `PROJECT=$(gh project view ${projectId} --owner ${owner} --format json | jq -r '.id'); FIELDS=$(gh project field-list ${projectId} --owner ${owner} --format json); FIELD=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="Status") | .id'); OPTION=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="Status") | .options[] | select(.name=="${status}") | .id'); ITEM=$(gh project item-list ${projectId} --owner ${owner} --format json | jq -r '.items[] | select(.content.number==${issue}) | .id'); gh project item-edit --id "$ITEM" --project-id "$PROJECT" --field-id "$FIELD" --single-select-option-id "$OPTION"`;
+        const command = `PROJECT=$(gh project view ${projectNumber} --owner ${owner} --format json | jq -r '.id'); FIELDS=$(gh project field-list ${projectNumber} --owner ${owner} --format json); FIELD=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="Status") | .id'); OPTION=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="Status") | .options[] | select(.name=="${status}") | .id'); ITEM=$(gh project item-list ${projectNumber} --owner ${owner} --format json | jq -r '.items[] | select(.content.number==${issueNumber}) | .id'); gh project item-edit --id "$ITEM" --project-id "$PROJECT" --field-id "$FIELD" --single-select-option-id "$OPTION"`;
         
         await vscode.window.withProgress(
           {
@@ -82,7 +105,7 @@ export function activate(context: vscode.ExtensionContext) {
         );
 
         vscode.window.showInformationMessage(
-          `Successfully updated issue #${issue} to "${status}"`,
+          `Successfully updated issue #${issueNumber} to "${status}"`,
         );
       } catch (error) {
         vscode.window.showErrorMessage(
