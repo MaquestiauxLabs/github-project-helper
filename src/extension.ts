@@ -33,11 +33,13 @@ export function activate(context: vscode.ExtensionContext) {
           return;
         }
 
-        const projectItems = projectsArray.map((p: any) => ({
-          label: p.title,
-          description: `#${p.number}`,
-          id: p.id
-        }));
+        const projectItems = projectsArray
+          .map((p: any) => ({
+            label: p.title,
+            description: `#${p.number}`,
+            id: p.id
+          }))
+          .sort((a: any, b: any) => a.label.localeCompare(b.label));
 
         const selectedProject = await vscode.window.showQuickPick(projectItems, {
           placeHolder: "Select GitHub project",
