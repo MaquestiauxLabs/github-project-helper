@@ -6,7 +6,7 @@
     "email": "maquejp@gmail.com"
   },
   "description": "Manage GitHub Project directly from VS Code with GitHub CLI integration",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "engines": {
     "vscode": "^1.109.0"
   },
