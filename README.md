@@ -1,25 +1,59 @@
 # GitHub Project Helper
 
-A VS Code extension that helps you manage GitHub Project V2 statuses directly from your editor. This extension integrates with GitHub CLI to provide a seamless workflow for updating issue statuses within GitHub Projects.
+A VS Code extension that provides a **full-featured kanban board interface** for managing GitHub Project V2 directly within your editor. This extension brings the power of GitHub Projects to your VS Code workspace with a beautiful, drag-and-drop web interface.
 
-## Features
+## 🚀 Key Features
 
-- 🚀 **Project Selection**: Browse and select from your GitHub organization's projects
-- 📋 **Issue Management**: View all issues from a selected project with their current status
-- 🏷️ **Status Updates**: Update issue status (Todo, In Progress, Done) with a single click
-- 🔄 **Real-time Updates**: Fetches live data from your GitHub projects
-- 📊 **Status Visualization**: Issues are sorted by status (Todo → In Progress → Done) for better prioritization
-- 🏢 **Workspace Projects**: Configure frequently used projects for quick access
-- ⚙️ **Customizable Settings**: Configure organizations, defaults, and status options
-- 🎯 **Smart Defaults**: Pre-fill organization and project selections for faster workflow
-- ⚡ **Performance Optimized**: Reduced API calls with intelligent data caching
-- 🏗️ **Modular Architecture**: Clean, maintainable codebase with separation of concerns
+### 📋 **Full Kanban Board Interface**
 
-## Requirements
+- **Beautiful kanban board** with drag-and-drop functionality
+- **Multi-column layout** based on your project's status field options
+- **Real-time status updates** by dragging items between columns
+- **Visual feedback** with hover effects and smooth transitions
+- **Column item counts** that update dynamically
+
+### 🎯 **Three-Panel Navigation System**
+
+- **Project Selector**: Search and browse GitHub organizations and projects
+- **Kanban Board**: Interactive board for managing project items
+- **Issue Details View**: Comprehensive information sidebar with interactive status updates
+
+### ⚡ **Advanced UI Features**
+
+- **Modern web-based interface** that integrates seamlessly with VS Code themes
+- **Drag-and-drop** functionality for instant status changes
+- **Real-time updates** without page refreshes
+- **Loading states** and progress indicators
+- **Responsive design** that adapts to your VS Code theme
+- **Accessibility features** including ARIA labels and keyboard navigation
+
+### 🔗 **Deep GitHub Integration**
+
+- **GitHub CLI integration** for reliable data fetching and updates
+- **GraphQL queries** for detailed issue information
+- **Support for private projects** and organizations
+- **Real-time data synchronization** with GitHub Projects
+- **Error handling** and fallback mechanisms
+
+### 📊 **Rich Issue Information**
+
+- **Issue cards** display:
+  - Title with external GitHub links
+  - Type badges (Issue, PR, Draft)
+  - Repository name and issue number
+  - Current status and assignees
+  - Labels with visual tags
+
+### 🎨 **Modern Web Architecture**
+
+- **Single unified panel** that transitions between different views
+- **Efficient data fetching** with intelligent caching
+- **Minimal API calls** through smart batching
+- **Webview message passing** for async operations
+
+## 📋 Requirements
 
 ### Prerequisites
-
-Before using this extension, you need:
 
 1. **GitHub CLI (`gh`)**: Install and authenticate with GitHub
 
@@ -33,7 +67,7 @@ Before using this extension, you need:
    gh auth login
    ```
 
-2. **jq**: JSON processor for command line
+2. **jq**: JSON processor for command line (required for GitHub CLI integration)
 
    ```bash
    # macOS: brew install jq
@@ -41,13 +75,11 @@ Before using this extension, you need:
    # Linux: sudo apt install jq
    ```
 
-3. **GitHub Access**: Make sure you have access to the organization's projects
-
 ### VS Code Requirements
 
 - VS Code version 1.109.0 or higher
 
-## Installation
+## 🚀 Installation
 
 ### From Marketplace (Recommended)
 
@@ -72,186 +104,121 @@ Before using this extension, you need:
 3. Press `F5` to open a new Extension Development Host window
 4. The extension will be available in the new window
 
-## Usage
+## 💻 Usage
 
-### Basic Usage
+### Getting Started
 
 1. **Open Command Palette**: Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
-2. **Run Command**: Type "Update GitHub Issue Status" and select it
-3. **Follow the Prompts**:
-   - Enter your GitHub organization/owner name (e.g., "my-org")
-   - Select a project from the dropdown list
-   - Choose an issue to update from the project's issues
-   - Select the new status (Todo, In Progress, or Done)
+2. **Run Command**: Type "GitHub Project Helper: Open Kanban Board" and select it
+3. **Project Selection**:
+   - Enter any GitHub username or organization name
+   - Browse through available projects with visual cards
+   - Select a project to open the kanban board
 
-### Step-by-Step Examples
+### Using the Kanban Board
 
-#### Basic Usage
-1. Press `Ctrl+Alt+G` (or `Ctrl+Shift+P` → "GPH: Update GitHub Issue Status")
-2. Choose selection method:
-   - **Select from workspace projects** (if configured)
-   - **Browse GitHub** (normal flow)
-3. Enter/select organization name
-4. Select project from dropdown
-5. Choose issue to update
-6. Select new status
+#### **Navigation**
 
-#### Using Workspace Projects
-1. Configure workspace projects in settings or use "GPH: Add Project to Workspace"
-2. Press `Ctrl+Alt+G`
-3. Select "Select from workspace projects"
-4. Choose from your pre-configured projects
-5. Continue with issue selection and status update
+- **Project Selector** → **Kanban Board** → **Issue Details**
+- Use the back button or navigation breadcrumbs to return to previous views
 
-#### Managing Workspace Projects
-1. **Add project**: `Ctrl+Shift+P` → "GPH: Add Project to Workspace"
-   - Enter organization
-   - Select project from GitHub
-   - Add optional description
-2. **Remove projects**: `Ctrl+Shift+P` → "GPH: Remove Workspace Projects"
-   - Select projects to remove (multi-select)
-   - Confirm removal
+#### **Managing Issues**
 
-### Status Display
+- **Drag and drop** items between columns to update their status
+- **Click on items** to view detailed information
+- **External links** open issues directly in GitHub
+- **Hover effects** provide visual feedback
 
-Issues are displayed with their current status:
-- **Todo**: Items that need to be started
-- **In Progress**: Currently being worked on
-- **Done**: Completed items
-- **No Status**: Items without a status assigned
-- **Custom**: Any status options you configure
+#### **Issue Details Panel**
 
-### Sorting
+- View comprehensive issue information in a clean sidebar layout
+- **Interactive status dropdown** for quick status changes
+- View assignees, labels, and issue metadata
+- **"Open on GitHub" button** for direct navigation
 
-- **Projects**: Sorted alphabetically by name
-- **Issues**: Sorted by status priority based on your `statusOptions` configuration
+### Status Management
 
-## Commands
+The kanban board automatically creates columns based on your project's status field:
 
-| Command | Description | Keyboard Shortcut |
-|---------|-------------|------------------|
-| `github-project-helper.updateStatus` | Update GitHub Project issue status | `Ctrl+Alt+G` (Mac: `Cmd+Alt+G`) |
-| `github-project-helper.addWorkspaceProject` | Add project to workspace for quick access | None |
-| `github-project-helper.removeWorkspaceProjects` | Remove projects from workspace configuration | None |
+- **Status options** are fetched directly from your GitHub Project
+- **Custom statuses** are fully supported
+- **Real-time updates** reflect changes immediately
+- **Visual indicators** show item counts per column
 
-## Configuration
+### Project Types Supported
 
-### Extension Settings
+- **Personal projects** (your own repositories)
+- **Organization projects** (team collaboration)
+- **Private projects** (with proper permissions)
+- **Public projects** (open source projects)
 
-You can configure the extension through VS Code settings (`Ctrl+,`) or by editing your `.vscode/settings.json` file:
+## 🎮 Commands
 
-#### Organizations
+| Command                                 | Description                     | Keyboard Shortcut               |
+| --------------------------------------- | ------------------------------- | ------------------------------- |
+| `github-project-helper.openKanbanBoard` | Open the kanban board interface | `Ctrl+Alt+G` (Mac: `Cmd+Alt+G`) |
+
+## 🔧 Configuration
+
+The extension provides sensible defaults out of the box, but you can customize certain behaviors through VS Code settings:
+
 ```json
 {
-  "githubProjectHelper.organizations": [
-    "MyOrg",
-    "AnotherOrg",
-    "OpenSourceProject"
-  ]
+  // Optional: Default organization to pre-fill in project selector
+  "githubProjectHelper.defaultOwner": "your-org"
 }
 ```
 
-#### Workspace Projects
-```json
-{
-  "githubProjectHelper.workspaceProjects": [
-    {
-      "name": "Frontend Development",
-      "owner": "MyOrg",
-      "description": "Main frontend project"
-    },
-    {
-      "name": "Backend API",
-      "owner": "MyOrg",
-      "description": "REST API services"
-    }
-  ]
-}
+## 🏗️ Architecture
+
+### Project Structure
+
+```text
+src/
+├── extension.ts              # Main extension entry point
+├── unifiedPanel.ts          # Core webview management (293 lines)
+├── githubCli.ts            # GitHub API integration (212 lines)
+├── types.ts                # TypeScript interfaces
+├── templates/              # HTML templates for each UI view
+│   ├── kanban.html        # Kanban board with drag-drop (335 lines)
+│   ├── selector.html      # Project search interface (447 lines)
+│   ├── issueDetail.html   # Detailed issue view
+│   └── *.ts               # Template generation logic
+└── utils/
+    └── htmlUtils.ts       # HTML utilities and item rendering
 ```
 
-#### Default Values
-```json
-{
-  "githubProjectHelper.defaultOwner": "MyOrg",
-  "githubProjectHelper.defaultProject": "Frontend Development"
-}
-```
+### Technical Stack
 
-#### Custom Status Options
-```json
-{
-  "githubProjectHelper.statusOptions": [
-    "Todo",
-    "In Progress", 
-    "Review",
-    "Testing",
-    "Done"
-  ]
-}
-```
+- **TypeScript** (ES2022, Node16 modules)
+- **VS Code Extension API**
+- **GitHub CLI (gh)** integration
+- **Webpack** for bundling
+- **HTML/CSS/JavaScript** for the webview UI
+- **GraphQL** via GitHub CLI for detailed data fetching
 
-#### UI Preferences
-```json
-{
-  "githubProjectHelper.showQuickPickForOwner": true
-}
-```
-
-### Managing Workspace Projects
-
-Instead of manually editing JSON, you can use the built-in commands:
-
-1. **Add Project to Workspace**:
-   - Press `Ctrl+Shift+P`
-   - Type "GPH: Add Project to Workspace"
-   - Enter organization name
-   - Select project from dropdown
-   - Add optional description
-
-2. **Remove Workspace Projects**:
-   - Press `Ctrl+Shift+P`
-   - Type "GPH: Remove Workspace Projects"
-   - Select projects to remove (multi-select supported)
-
-### Keyboard Shortcuts
-
-The extension includes a default shortcut:
-- `Ctrl+Alt+G` (Mac: `Cmd+Alt+G`) - Update GitHub Issue Status
-
-You can customize shortcuts:
-1. Open VS Code settings (`Ctrl+,`)
-2. Go to "Keyboard Shortcuts" (`Ctrl+K Ctrl+S`)
-3. Search for "GitHub Project Helper"
-4. Click the pencil icon to modify shortcuts
-
-## Troubleshooting
+## 🔍 Troubleshooting
 
 ### Common Issues
 
-#### "Failed to fetch projects"
+#### "GitHub CLI not authenticated"
 
-- **Cause**: GitHub CLI not authenticated or no internet connection
-- **Solution**: Run `gh auth login` to authenticate
+- **Solution**: Run `gh auth login` to authenticate with GitHub
 
 #### "No projects found for owner"
 
-- **Cause**: Incorrect organization name or no access to projects
-- **Solution**: Verify the organization name and ensure you have the necessary permissions
+- **Cause**: Incorrect organization name or no access permissions
+- **Solution**: Verify the organization name and ensure you have necessary permissions
 
-#### "No issues found in project"
+#### "Failed to load project items"
 
-- **Cause**: The project exists but has no linked issues
-- **Solution**: Add some issues to your GitHub Project
+- **Cause**: Network issues or GitHub API problems
+- **Solution**: Check internet connection and try again
 
-#### Command failed: "invalid number"
+#### Drag-and-drop not working
 
-- **Cause**: Internal error with project number handling
-- **Solution**: Report the issue with steps to reproduce
-
-#### "Cannot find name 'child_process'" or "Cannot find name 'util'"
-
-- **Cause**: TypeScript configuration issue
-- **Solution**: Restart VS Code after installation
+- **Cause**: Webview security restrictions or VS Code version incompatibility
+- **Solution**: Ensure VS Code is updated to latest version
 
 ### Debug Mode
 
@@ -261,14 +228,7 @@ To enable debug logging:
 2. Go to Help → Toggle Developer Tools
 3. Check the Console tab for detailed error messages
 
-### Permissions Required
-
-The extension needs these GitHub permissions:
-
-- Read access to organization projects
-- Write access to project items (for status updates)
-
-## Development
+## 🛠️ Development
 
 ### Building from Source
 
@@ -287,42 +247,7 @@ npm run compile
 npm run watch
 ```
 
-### Project Structure
-
-```
-github-project-helper/
-├── src/
-│   ├── extension.ts              # Extension entry point and command registration
-│   ├── services/
-│   │   ├── githubService.ts      # GitHub API interactions and data models
-│   │   ├── configurationService.ts # VS Code settings management
-│   │   ├── workspaceProjectManager.ts # Workspace project operations
-│   │   └── issueStatusUpdater.ts # Main workflow logic
-│   └── test/
-│       └── extension.test.ts
-├── package.json          # Extension configuration
-├── tsconfig.json         # TypeScript configuration
-├── webpack.config.js      # Build configuration
-└── README.md             # This file
-```
-
-### Architecture
-
-The extension follows a modular architecture with separation of concerns:
-
-- **GitHubService**: Handles all GitHub CLI interactions and API calls
-- **ConfigurationService**: Manages VS Code settings and workspace configuration
-- **WorkspaceProjectManager**: Provides UI commands for workspace project management
-- **IssueStatusUpdater**: Orchestrates the main status update workflow
-- **Extension**: Minimal entry point for command registration
-
-This architecture ensures:
-- **Maintainability**: Each service has a single responsibility
-- **Testability**: Services can be unit tested independently
-- **Performance**: Optimized API calls with data caching
-- **Scalability**: Easy to extend with new features
-
-### Testing
+### Running Tests
 
 ```bash
 # Run tests
@@ -330,9 +255,12 @@ npm test
 
 # Run linting
 npm run lint
+
+# Run type checking
+npm run type-check
 ```
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -342,38 +270,40 @@ Contributions are welcome! Please follow these steps:
 4. Add tests if applicable
 5. Commit your changes (`git commit -m 'Add amazing feature'`)
 6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request to [MaquestiauxLabs/github-project-helper](https://github.com/MaquestiauxLabs/github-project-helper)
+7. Open a Pull Request
 
 ### Development Guidelines
 
-- Follow the existing code style
-- Add comments for complex logic
-- Test your changes thoroughly
+- Follow the existing code style and TypeScript conventions
+- Test your changes thoroughly with different project types
+- Ensure the kanban board functionality works correctly
 - Update documentation as needed
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Changelog
+## 📈 Changelog
 
-### Version 0.0.1 (Initial Release)
-- Project selection from GitHub organizations
-- Issue listing with status display
-- Status update functionality (Todo, In Progress, Done)
-- Automatic sorting of projects and issues
-- Progress indicators for long-running operations
-- Error handling and user feedback
-- Workspace project management with UI commands
-- Comprehensive settings for organizations, defaults, and status options
-- Keyboard shortcut support (`Ctrl+Alt+G`)
-- Smart default value pre-filling
-- Multi-select for removing workspace projects
-- Optimized API calls with data caching
-- Modular code architecture for maintainability
-- Reduced GitHub API load and faster response times
+### Version 2.0.0 - Complete UI Overhaul
 
-## Support
+- **New kanban board interface** with drag-and-drop functionality
+- **Three-panel navigation system** (selector → kanban → details)
+- **Modern web-based UI** replacing command-line interface
+- **Real-time status updates** through drag-and-drop
+- **Comprehensive issue details panel** with interactive elements
+- **Enhanced GitHub CLI integration** with GraphQL support
+- **Improved error handling** and user feedback
+- **Accessibility improvements** and keyboard navigation
+- **VS Code theme integration** for seamless appearance
+
+### Previous Versions
+
+- Command-line interface for status updates
+- Quick pick dialogs for project and issue selection
+- Workspace project management features
+
+## 🆘 Support
 
 If you encounter any issues or have feature requests:
 
@@ -382,15 +312,15 @@ If you encounter any issues or have feature requests:
    - VS Code version
    - Extension version
    - Steps to reproduce
-   - Error messages
-   - System information
+   - Screenshots if applicable
+   - Error messages from developer console
 
-## Related Extensions
+## 🔗 Related Extensions
 
 - [GitHub Pull Requests](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github) - Official GitHub extension for VS Code
 - [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens) - Git supercharged
 
-## Privacy Notice
+## 🔒 Privacy Notice
 
 This extension:
 
@@ -398,13 +328,19 @@ This extension:
 - Does not store or transmit any personal data
 - Does not track usage or collect analytics
 - Runs entirely locally on your machine
+- Respects your privacy and GitHub's terms of service
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 - [GitHub CLI](https://cli.github.com/) - For the amazing command-line interface
 - [jq](https://stedolan.github.io/jq/) - For JSON processing
 - [VS Code API](https://code.visualstudio.com/api) - For the extension framework
+- [GitHub Projects](https://docs.github.com/issues/planning-and-tracking-with-projects) - For the project management platform
 
 ---
 
-**Note**: This extension is not affiliated with GitHub, Inc. It's an independent tool built to enhance your GitHub Projects workflow.
+**Note**: This extension is not affiliated with GitHub, Inc. It's an independent tool built to enhance your GitHub Projects workflow within VS Code.
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=MaquestiauxLabs/github-project-helper&type=Date)](https://star-history.com/#MaquestiauxLabs/github-project-helper&Date)
