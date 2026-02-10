@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Project Kanban</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        padding: 20px;
+        font-family: var(--vscode-font-family);
+        color: var(--vscode-foreground);
+        background-color: var(--vscode-editor-background);
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--vscode-panel-border);
+      }
+
+      .header-title {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .header-title h1 {
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .header-title p {
+        color: var(--vscode-descriptionForeground);
+        font-size: 14px;
+      }
+
+      .back-button {
+        padding: 8px 16px;
+        background-color: var(--vscode-button-secondaryBackground);
+        color: var(--vscode-button-secondaryForeground);
+        border: none;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .back-button:hover {
+        background-color: var(--vscode-button-secondaryHoverBackground);
+      }
+
+      .kanban-board {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        padding-bottom: 20px;
+      }
+
+      .kanban-column {
+        flex: 0 0 300px;
+        background-color: var(--vscode-sideBar-background);
+        border-radius: 8px;
+        border: 1px solid var(--vscode-panel-border);
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 160px);
+      }
+
+      .column-header {
+        padding: 16px;
+        border-bottom: 1px solid var(--vscode-panel-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .column-header h3 {
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .item-count {
+        background-color: var(--vscode-badge-background);
+        color: var(--vscode-badge-foreground);
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .column-items {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-height: 100px;
+      }
+
+      .column-items.drag-over {
+        background-color: var(--vscode-list-dropBackground);
+      }
+
+      .kanban-item {
+        background-color: var(--vscode-editor-background);
+        border: 1px solid var(--vscode-panel-border);
+        border-radius: 6px;
+        padding: 12px;
+        cursor: move;
+        transition: all 0.2s;
+      }
+
+      .kanban-item:hover {
+        border-color: var(--vscode-focusBorder);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .kanban-item.dragging {
+        opacity: 0.5;
+      }
+
+      .item-title {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--vscode-foreground);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .item-open-btn {
+        flex-shrink: 0;
+        background: none;
+        border: none;
+        color: var(--vscode-foreground);
+        cursor: pointer;
+        font-size: 16px;
+        padding: 2px 4px;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+        border-radius: 3px;
+      }
+
+      .item-open-btn:hover {
+        opacity: 1;
+        background-color: var(--vscode-button-hoverBackground);
+        color: white;
+      }
+      }
+
+      .item-meta {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .item-type {
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .item-type.issue {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .item-type.pull-request {
+        background-color: #0366d6;
+        color: white;
+      }
+
+      .item-type.draft-issue {
+        background-color: #6a737d;
+        color: white;
+      }
+
+      .item-repo {
+        font-size: 11px;
+        color: var(--vscode-descriptionForeground);
+        font-family: monospace;
+      }
+
+      .empty-column {
+        text-align: center;
+        padding: 24px;
+        color: var(--vscode-descriptionForeground);
+        font-size: 13px;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-title">
+        <h1 id="projectTitle">{{PROJECT_TITLE}}</h1>
+        <p id="projectOwner">{{PROJECT_OWNER}}</p>
+      </div>
+      <button class="back-button" id="backButton">← Back to Projects</button>
+    </div>
+
+    <div class="kanban-board" id="kanbanBoard">{{KANBAN_COLUMNS}}</div>
+
+    <script>
+      const vscode = acquireVsCodeApi();
+
+      let draggedItem = null;
+
+      document.getElementById("backButton").addEventListener("click", () => {
+        vscode.postMessage({ command: "backToSelector" });
+      });
+
+      document.querySelectorAll(".kanban-item").forEach((item) => {
+        item.addEventListener("dragstart", (e) => {
+          draggedItem = item;
+          item.classList.add("dragging");
+          e.dataTransfer.effectAllowed = "move";
+        });
+
+        item.addEventListener("dragend", () => {
+          item.classList.remove("dragging");
+          draggedItem = null;
+        });
+
+        item.addEventListener("click", (e) => {
+          // Only handle click if not clicking the open button
+          if (e.target.classList.contains("item-open-btn")) {
+            return;
+          }
+          const itemId = item.getAttribute("data-item-id");
+          if (itemId) {
+            vscode.postMessage({
+              command: "openItem",
+              itemId: itemId,
+            });
+          }
+        });
+
+        // Handle the open icon button click
+        const openBtn = item.querySelector(".item-open-btn");
+        if (openBtn) {
+          openBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const itemId = e.target.getAttribute("data-item-id");
+            if (itemId) {
+              vscode.postMessage({
+                command: "openItem",
+                itemId: itemId,
+              });
+            }
+          });
+        }
+
+        item.querySelectorAll(".column-items").forEach((zone) => {
+          zone.addEventListener("dragenter", () => {
+            zone.classList.add("drag-over");
+          });
+
+          zone.addEventListener("dragleave", () => {
+            zone.classList.remove("drag-over");
+          });
+        });
+      });
+
+      document.querySelectorAll(".column-items").forEach((dropZone) => {
+        dropZone.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+          dropZone.classList.add("drag-over");
+        });
+
+        dropZone.addEventListener("dragleave", (e) => {
+          if (e.target === dropZone) {
+            dropZone.classList.remove("drag-over");
+          }
+        });
+
+        dropZone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropZone.classList.remove("drag-over");
+
+          if (draggedItem) {
+            const itemId = draggedItem.getAttribute("data-item-id");
+            const newStatus = dropZone.getAttribute("data-drop-zone");
+            const itemTitle = draggedItem.getAttribute("data-item-title");
+
+            dropZone.appendChild(draggedItem);
+
+            document.querySelectorAll(".kanban-column").forEach((col) => {
+              const headerCount = col.querySelector(".item-count");
+              const itemsZone = col.querySelector(".column-items");
+              const itemCount =
+                itemsZone.querySelectorAll(".kanban-item").length;
+              headerCount.textContent = itemCount.toString();
+
+              const emptyMsg = itemsZone.querySelector(".empty-column");
+              if (itemCount === 0 && !emptyMsg) {
+                itemsZone.innerHTML =
+                  '<div class="empty-column">No items</div>';
+              } else if (itemCount > 0 && emptyMsg) {
+                emptyMsg.remove();
+              }
+            });
+
+            vscode.postMessage({
+              command: "updateItemStatus",
+              itemId: itemId,
+              itemTitle: itemTitle,
+              newStatus: newStatus,
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
