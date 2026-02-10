@@ -4,6 +4,15 @@ All notable changes to the "github-project-helper" extension will be documented 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [2.0.1] - 2026-02-10
+
+### Added
+- LICENSE file (MIT license) for proper licensing compliance
+- `package-vsix` script for easier VSIX generation
+
+### Fixed
+- Removed LICENSE warning during packaging
+
 ## [2.0.0] - 2026-02-10
 
 ### Added
