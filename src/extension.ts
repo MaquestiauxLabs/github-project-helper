@@ -8,7 +8,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Register the main command
   const openProjectsCommand = vscode.commands.registerCommand(
-    "test-gh-interfacing.openGitHubProjects",
+    "github-project-helper.openGitHubProjects",
     async () => {
       await openGitHubProjectKanban(context);
     },

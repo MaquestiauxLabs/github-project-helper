@@ -1,12 +1,12 @@
 {
   "name": "github-project-helper",
-  "displayName": "github-project-helper",
+  "displayName": "GitHub Project Helper",
   "author": {
     "name": "Jean-Philippe Maquestiaux",
     "email": "maquejp@gmail.com"
   },
-  "description": "Manage GitHub Project V2 statuses directly from VS Code with GitHub CLI integration",
-  "version": "0.0.1",
+  "description": "Manage GitHub Project directly from VS Code with GitHub CLI integration",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.109.0"
   },
@@ -18,8 +18,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "test-gh-interfacing.openGitHubProjects",
-        "title": "GitHub Projects: Open Project Kanban"
+        "command": "github-project-helper.openGitHubProjects",
+        "title": "GitHub Projects: Open Project Helper"
       }
     ]
   },
