@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Issue Detail</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        padding: 20px;
+        font-family: var(--vscode-font-family);
+        color: var(--vscode-foreground);
+        background-color: var(--vscode-editor-background);
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--vscode-panel-border);
+      }
+
+      .back-button {
+        padding: 8px 16px;
+        background-color: var(--vscode-button-secondaryBackground);
+        color: var(--vscode-button-secondaryForeground);
+        border: none;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .back-button:hover {
+        background-color: var(--vscode-button-secondaryHoverBackground);
+      }
+
+      .issue-container {
+        max-width: 900px;
+      }
+
+      .issue-header {
+        margin-bottom: 24px;
+      }
+
+      .issue-title {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        line-height: 1.3;
+      }
+
+      .issue-meta {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+        color: var(--vscode-descriptionForeground);
+      }
+
+      .issue-number {
+        font-size: 16px;
+        font-family: monospace;
+        color: var(--vscode-descriptionForeground);
+      }
+
+      .issue-state {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .issue-state.open {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .issue-state.closed {
+        background-color: #cb2431;
+        color: white;
+      }
+
+      .issue-badge {
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .issue-badge.issue {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .issue-badge.pull-request {
+        background-color: #0366d6;
+        color: white;
+      }
+
+      .issue-type-field {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        background-color: var(--vscode-editor-background);
+        color: var(--vscode-foreground);
+        border: 1px solid var(--vscode-panel-border);
+      }
+
+      .issue-label {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 500;
+        background-color: var(--vscode-editor-background);
+        color: var(--vscode-foreground);
+        border: 1px solid var(--vscode-panel-border);
+        margin-right: 8px;
+      }
+
+      .issue-labels-inline {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .issue-content {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 24px;
+      }
+
+      .issue-body {
+        background-color: var(--vscode-sideBar-background);
+        border: 1px solid var(--vscode-panel-border);
+        border-radius: 8px;
+        padding: 20px;
+      }
+
+      .issue-body-section {
+        margin-bottom: 20px;
+      }
+
+      .issue-body-section:last-child {
+        margin-bottom: 0;
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        color: var(--vscode-descriptionForeground);
+        letter-spacing: 0.5px;
+      }
+
+      .body-text {
+        font-size: 14px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .empty-body {
+        font-style: italic;
+        color: var(--vscode-descriptionForeground);
+      }
+
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .sidebar-card {
+        background-color: var(--vscode-sideBar-background);
+        border: 1px solid var(--vscode-panel-border);
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .card-title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        color: var(--vscode-descriptionForeground);
+        letter-spacing: 0.5px;
+      }
+
+      .card-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .sidebar-item {
+        font-size: 13px;
+        padding: 6px 8px;
+        background-color: var(--vscode-editor-background);
+        border-radius: 4px;
+      }
+
+      .sidebar-empty {
+        font-size: 13px;
+        color: var(--vscode-descriptionForeground);
+        font-style: italic;
+        padding: 6px 0;
+      }
+
+      .badge-field {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 500;
+        background-color: var(--vscode-editor-background);
+        color: var(--vscode-foreground);
+        border: 1px solid var(--vscode-panel-border);
+      }
+
+      .status-select {
+        width: 100%;
+        padding: 6px 8px;
+        background-color: var(--vscode-editor-background);
+        color: var(--vscode-foreground);
+        border: 1px solid var(--vscode-panel-border);
+        border-radius: 4px;
+        font-size: 13px;
+        font-family: var(--vscode-font-family);
+        cursor: pointer;
+      }
+
+      .status-select:hover {
+        border-color: var(--vscode-focusBorder);
+      }
+
+      .status-select:focus {
+        outline: none;
+        border-color: var(--vscode-focusBorder);
+        box-shadow: 0 0 0 2px var(--vscode-focusBorder);
+      }
+
+      .status-item,
+      .field-item {
+        font-size: 13px;
+        padding: 8px;
+        background-color: var(--vscode-editor-background);
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .status-label,
+      .field-label {
+        color: var(--vscode-descriptionForeground);
+      }
+
+      .status-value,
+      .field-value {
+        font-weight: 500;
+        color: var(--vscode-foreground);
+      }
+
+      .external-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        margin-top: 16px;
+        background-color: var(--vscode-button-background);
+        color: var(--vscode-button-foreground);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        text-decoration: none;
+        transition: background-color 0.2s;
+      }
+
+      .external-link:hover {
+        background-color: var(--vscode-button-hoverBackground);
+      }
+
+      @media (max-width: 768px) {
+        .issue-content {
+          grid-template-columns: 1fr;
+        }
+
+        .issue-title {
+          font-size: 22px;
+        }
+
+        .issue-meta {
+          font-size: 13px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <button class="back-button" id="backButton">← Back to Kanban</button>
+    </div>
+
+    <div class="issue-container">
+      <div class="issue-header">
+        <div class="issue-title" id="issueTitle">{{ISSUE_TITLE}}</div>
+        <div class="issue-meta">
+          <span class="issue-number" id="issueNumber">{{ISSUE_NUMBER}}</span>
+          <span class="issue-state {{ISSUE_STATE_CLASS}}" id="issueState"
+            >{{ISSUE_STATE}}</span
+          >
+          <span class="issue-badge {{ISSUE_TYPE_CLASS}}" id="issueType"
+            >{{ISSUE_TYPE}}</span
+          >
+          <span id="issueRepository">{{ISSUE_REPOSITORY}}</span>
+        </div>
+      </div>
+
+      <div class="issue-content">
+        <div class="issue-body">
+          <div class="issue-body-section">
+            <div class="section-title">Description</div>
+            <div class="body-text" id="issueBody">{{ISSUE_BODY}}</div>
+          </div>
+        </div>
+
+        {{ISSUE_SIDEBAR}}
+      </div>
+    </div>
+
+    <script>
+      const vscode = acquireVsCodeApi();
+
+      document.getElementById("backButton").addEventListener("click", () => {
+        vscode.postMessage({ command: "backToKanban" });
+      });
+
+      document.getElementById("openOnGithub").addEventListener("click", () => {
+        vscode.postMessage({ command: "openOnGithub", url: "{{ISSUE_URL}}" });
+      });
+
+      // Handle status change
+      const statusSelect = document.getElementById("statusSelect");
+      if (statusSelect) {
+        statusSelect.addEventListener("change", (e) => {
+          const itemId = e.target.getAttribute("data-item-id");
+          const newStatus = e.target.value;
+          vscode.postMessage({
+            command: "updateItemStatus",
+            itemId: itemId,
+            newStatus: newStatus,
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
